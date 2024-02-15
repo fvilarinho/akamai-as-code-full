@@ -1,0 +1,12 @@
+{
+  "id": "akamai-as-code",
+  "description": "This file contains certificate attributes.",
+  "networkType": "enhanced-tls",
+  "disallowedTlsVersions": [
+    "TLSv1",
+    "TLSv1_1"
+  ],
+  "geography": "core",
+  "ciphersList": "ak-akamai-2020q1",
+  "signatureAlgorithm": "SHA-256"
+}

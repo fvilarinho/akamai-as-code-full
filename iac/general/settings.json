@@ -1,0 +1,27 @@
+{
+  "contract": "<contract-id>",
+  "group": "<group-id",
+  "organization": {
+    "id": "<organization-id>",
+    "address": {
+      "line1": "<street-name>",
+      "line2": "<street-number>",
+      "country": "<country-code>",
+      "state": "<state-code>",
+      "city": "<city>",
+      "zipCode": "<zipCode>"
+    },
+    "administratorContact": {
+      "firstName": "<firstName>",
+      "lastName": "<lastName>",
+      "phone": "<phone>",
+      "email": "<email>"
+    },
+    "technicalContact": {
+      "firstName": "<firstName>",
+      "lastName": "<lastName>",
+      "phone": "<phone>",
+      "email": "<email>"
+    }
+  }
+}

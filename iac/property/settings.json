@@ -1,0 +1,11 @@
+{
+  "id": "akamai-as-code",
+  "description": "This file contains CDN attributes. Specific attributes such as caching and redirects are stored separately.",
+  "product": "prd_Fresca",
+  "hostnames": [ "www.example.com", "www-test.example.com" ],
+  "origin": {
+    "region": "us-east-1"
+  },
+  "ipVersion": "IPV4",
+  "versionNotes": "initial configuration."
+}

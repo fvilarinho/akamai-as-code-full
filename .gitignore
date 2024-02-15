@@ -1,0 +1,4 @@
+/.idea/
+/iac/.terraform.lock.hcl
+/iac/.terraform
+/iac/.credentials
