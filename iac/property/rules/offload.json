@@ -197,6 +197,7 @@
         {
             "name": "tieredDistribution",
             "options": {
+                "tieredDistributionMap": "CH2",
                 "enabled": true
             }
         },

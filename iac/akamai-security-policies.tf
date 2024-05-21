@@ -1,35 +1,26 @@
-# Definition of the security policies.
+# Definition of security policies.
 resource "akamai_appsec_security_policy" "default" {
+  for_each               = { for policy in local.securitySettings.policies : policy.name => policy }
   config_id              = akamai_appsec_configuration.default.config_id
-  security_policy_name   = local.securitySettings.policies[0].id
-  security_policy_prefix = "pol1"
+  security_policy_name   = each.key
+  security_policy_prefix = each.value.prefix
   default_settings       = true
   depends_on             = [ akamai_appsec_configuration.default ]
 }
 
-resource "akamai_appsec_security_policy" "deny" {
-  config_id              = akamai_appsec_configuration.default.config_id
-  security_policy_name   = local.securitySettings.policies[1].id
-  security_policy_prefix = "pol2"
-  default_settings       = true
-  depends_on             = [ akamai_appsec_configuration.default ]
-}
-
-# Definition of the security match targets.
+# Definition of security policies' match targets.
 resource "akamai_appsec_match_target" "default" {
+  for_each     = { for policy in local.securitySettings.policies : policy.name => policy }
   config_id    = akamai_appsec_configuration.default.config_id
   match_target = jsonencode(
     {
       "defaultFile" : "NO_MATCH",
-      "filePaths" : [
-        "/*"
-      ],
-      "hostnames" : local.securitySettings.policies[0].hostNames,
-      "filePaths" : local.securitySettings.policies[0].filePaths,
+      "hostnames" : each.value.hostnames,
+      "filePaths" : each.value.filePaths,
       "isNegativeFileExtensionMatch" : false,
       "isNegativePathMatch" : false,
       "securityPolicy" : {
-        "policyId" : akamai_appsec_security_policy.default.security_policy_id
+        "policyId" : akamai_appsec_security_policy.default[each.key].security_policy_id
       },
       "sequence" : 0,
       "type" : "website"
@@ -37,24 +28,4 @@ resource "akamai_appsec_match_target" "default" {
   )
 
   depends_on = [ akamai_appsec_security_policy.default ]
-}
-
-resource "akamai_appsec_match_target" "deny" {
-  config_id    = akamai_appsec_configuration.default.config_id
-  match_target = jsonencode(
-    {
-      "defaultFile" : "NO_MATCH",
-      "hostnames" : local.securitySettings.policies[1].hostNames,
-      "filePaths" : local.securitySettings.policies[1].filePaths,
-      "isNegativeFileExtensionMatch" : false,
-      "isNegativePathMatch" : false,
-      "securityPolicy" : {
-        "policyId" : akamai_appsec_security_policy.deny.security_policy_id
-      },
-      "sequence" : 0,
-      "type" : "website"
-    }
-  )
-
-  depends_on = [ akamai_appsec_security_policy.deny ]
 }

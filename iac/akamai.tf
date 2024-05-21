@@ -1,5 +1,10 @@
 # Definition of the Akamai EdgeGrid credentials.
 provider "akamai" {
-  edgerc         = pathexpand(fileexists(pathexpand(var.credentialsFilename)) ? var.credentialsFilename : "~/.edgerc")
-  config_section = fileexists(pathexpand(var.credentialsFilename)) ? "edgegrid" : "default"
+  config {
+    account_key   = var.edgeGridAccountKey
+    host          = var.edgeGridHost
+    access_token  = var.edgeGridAccessToken
+    client_token  = var.edgeGridClientToken
+    client_secret = var.edgeGridClientSecret
+  }
 }

@@ -1,10 +1,10 @@
 {
-  "id": "example.com",
+  "zone": "example.com",
   "description": "This file contains DNS attributes.",
   "defaultTtl": 30,
   "records": [
     {
-      "id": "test",
+      "name": "text",
       "type": "TXT",
       "ttl": 30,
       "value": "This is a test."

@@ -3,5 +3,5 @@ resource "akamai_cp_code" "default" {
   contract_id = local.generalSettings.contract
   group_id    = local.generalSettings.group
   product_id  = local.propertySettings.product
-  name        = local.propertySettings.id
+  name        = local.propertySettings.name
 }

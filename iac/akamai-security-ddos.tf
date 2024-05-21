@@ -1,36 +1,34 @@
 # Definition of DDoS rate limits protection.
 resource "akamai_appsec_rate_protection" "default" {
+  for_each           = { for policy in local.securitySettings.policies : policy.name => policy }
   config_id          = akamai_appsec_configuration.default.config_id
-  security_policy_id = akamai_appsec_security_policy.default.security_policy_id
-  enabled            = local.securitySettings.policies[0].ddos.rateLimits.enabled
+  security_policy_id = akamai_appsec_security_policy.default[each.key].security_policy_id
+  enabled            = each.value.ddos.rateLimits.enabled
   depends_on         = [ akamai_appsec_security_policy.default ]
 }
 
-resource "akamai_appsec_rate_protection" "deny" {
+# Definition of DDoS rate limits rules (Client to Edge).
+resource "akamai_appsec_rate_policy_action" "edgeRateLimits" {
+  for_each           = { for policy in local.securitySettings.policies : policy.name => policy }
   config_id          = akamai_appsec_configuration.default.config_id
-  security_policy_id = akamai_appsec_security_policy.default.security_policy_id
-  enabled            = local.securitySettings.policies[1].ddos.rateLimits.enabled
-  depends_on         = [ akamai_appsec_security_policy.deny ]
-}
-
-resource "akamai_appsec_rate_policy_action" "defaultEdgeRateLimits" {
-  config_id          = akamai_appsec_configuration.default.config_id
-  security_policy_id = akamai_appsec_security_policy.default.security_policy_id
+  security_policy_id = akamai_appsec_security_policy.default[each.key].security_policy_id
   rate_policy_id     = akamai_appsec_rate_policy.edgeRateLimits.rate_policy_id
-  ipv4_action        = local.securitySettings.policies[0].ddos.rateLimits.edge.action
-  ipv6_action        = local.securitySettings.policies[0].ddos.rateLimits.edge.action
+  ipv4_action        = each.value.ddos.rateLimits.edge.action
+  ipv6_action        = each.value.ddos.rateLimits.edge.action
   depends_on         = [
     akamai_appsec_rate_protection.default,
     akamai_appsec_rate_policy.edgeRateLimits
   ]
 }
 
-resource "akamai_appsec_rate_policy_action" "defaultOriginRateLimits" {
+# Definition of DDoS rate limits rules (Edge to Origin).
+resource "akamai_appsec_rate_policy_action" "originRateLimits" {
+  for_each           = { for policy in local.securitySettings.policies : policy.name => policy }
   config_id          = akamai_appsec_configuration.default.config_id
-  security_policy_id = akamai_appsec_security_policy.default.security_policy_id
+  security_policy_id = akamai_appsec_security_policy.default[each.key].security_policy_id
   rate_policy_id     = akamai_appsec_rate_policy.originRateLimits.rate_policy_id
-  ipv4_action        = local.securitySettings.policies[0].ddos.rateLimits.origin.action
-  ipv6_action        = local.securitySettings.policies[0].ddos.rateLimits.origin.action
+  ipv4_action        = each.value.ddos.rateLimits.origin.action
+  ipv6_action        = each.value.ddos.rateLimits.origin.action
   depends_on         = [
     akamai_appsec_rate_protection.default,
     akamai_appsec_rate_policy.originRateLimits
@@ -39,33 +37,20 @@ resource "akamai_appsec_rate_policy_action" "defaultOriginRateLimits" {
 
 # Definition of DDoS slowpost protection.
 resource "akamai_appsec_slowpost_protection" "default" {
+  for_each           = { for policy in local.securitySettings.policies : policy.name => policy }
   config_id          = akamai_appsec_configuration.default.config_id
-  security_policy_id = akamai_appsec_security_policy.default.security_policy_id
-  enabled            = local.securitySettings.policies[0].ddos.slowPost.enabled
+  security_policy_id = akamai_appsec_security_policy.default[each.key].security_policy_id
+  enabled            = each.value.ddos.slowPost.enabled
   depends_on         = [ akamai_appsec_security_policy.default ]
 }
 
-resource "akamai_appsec_slowpost_protection" "deny" {
-  config_id          = akamai_appsec_configuration.default.config_id
-  security_policy_id = akamai_appsec_security_policy.deny.security_policy_id
-  enabled            = local.securitySettings.policies[1].ddos.slowPost.enabled
-  depends_on         = [ akamai_appsec_security_policy.deny ]
-}
-
+# Definition of DDoS slowpost rules.
 resource "akamai_appsec_slow_post" "default" {
+  for_each                   = { for policy in local.securitySettings.policies : policy.name => policy }
   config_id                  = akamai_appsec_configuration.default.config_id
-  security_policy_id         = akamai_appsec_security_policy.default.security_policy_id
-  slow_rate_threshold_rate   = local.securitySettings.policies[0].ddos.slowPost.threshold.rate
-  slow_rate_threshold_period = local.securitySettings.policies[0].ddos.slowPost.threshold.period
-  slow_rate_action           = local.securitySettings.policies[0].ddos.slowPost.action
+  security_policy_id         = akamai_appsec_security_policy.default[each.key].security_policy_id
+  slow_rate_threshold_rate   = each.value.ddos.slowPost.threshold.rate
+  slow_rate_threshold_period = each.value.ddos.slowPost.threshold.period
+  slow_rate_action           = each.value.ddos.slowPost.action
   depends_on                 = [ akamai_appsec_slowpost_protection.default ]
-}
-
-resource "akamai_appsec_slow_post" "deny" {
-  config_id                  = akamai_appsec_configuration.default.config_id
-  security_policy_id         = akamai_appsec_security_policy.deny.security_policy_id
-  slow_rate_threshold_rate   = local.securitySettings.policies[1].ddos.slowPost.threshold.rate
-  slow_rate_threshold_period = local.securitySettings.policies[1].ddos.slowPost.threshold.period
-  slow_rate_action           = local.securitySettings.policies[1].ddos.slowPost.action
-  depends_on                 = [ akamai_appsec_slowpost_protection.deny ]
 }

@@ -1,12 +1,13 @@
 # Definition of the property rules (CDN configuration).
 data "akamai_property_rules_template" "default" {
+  for_each      = { for property in local.propertySettings.hostnames : property.name => property }
   template_file = abspath("property/rules/main.json")
 
   # Definition of the Origin Hostname variable.
   variables {
     name  = "originHostname"
     type  = "string"
-    value = linode_object_storage_bucket.default.hostname
+    value = linode_object_storage_bucket.default[each.key].hostname
   }
 
   # Definition of the CP Code variable.
@@ -15,34 +16,22 @@ data "akamai_property_rules_template" "default" {
     type  = "number"
     value = replace(akamai_cp_code.default.id, "cpc_", "")
   }
-
-  # Version notes.
-  variables {
-    name  = "versionNotes"
-    type  = "string"
-    value = local.propertySettings.versionNotes
-  }
-
-  depends_on = [ linode_object_storage_bucket.default ]
 }
 
 # Definition of the property (CDN configuration).
 resource "akamai_property" "default" {
+  for_each    = { for property in local.propertySettings.hostnames : property.name => property }
   contract_id = local.generalSettings.contract
   group_id    = local.generalSettings.group
   product_id  = local.propertySettings.product
-  name        = local.propertySettings.id
-  rules       = data.akamai_property_rules_template.default.json
+  name        = "${local.propertySettings.name}-${each.value.origin.name}"
+  rules       = data.akamai_property_rules_template.default[each.key].json
 
   # Definition of all hostnames of the property.
-  dynamic "hostnames" {
-    for_each = toset(local.propertySettings.hostnames)
-
-    content {
-      cname_from             = hostnames.value
-      cname_to               = akamai_edge_hostname.default.edge_hostname
-      cert_provisioning_type = "CPS_MANAGED"
-    }
+  hostnames {
+    cname_from             = "${each.key}.${local.dnsSettings.zone}"
+    cname_to               = akamai_edge_hostname.default[each.key].edge_hostname
+    cert_provisioning_type = "DEFAULT"
   }
 
   depends_on = [
@@ -53,14 +42,12 @@ resource "akamai_property" "default" {
 
 # Activates the property (CDN configuration).
 resource "akamai_property_activation" "default" {
-  property_id                    = akamai_property.default.id
-  version                        = akamai_property.default.latest_version
-  contact                        = [ local.generalSettings.organization.technicalContact.email ]
-  note                           = local.propertySettings.versionNotes
+  for_each                       = { for property in local.propertySettings.hostnames : property.name => property }
+  property_id                    = akamai_property.default[each.key].id
+  version                        = akamai_property.default[each.key].latest_version
+  contact                        = [ local.generalSettings.email ]
+  note                           = local.propertySettings.notes
   network                        = var.network
   auto_acknowledge_rule_warnings = true
-  depends_on                     = [
-    akamai_property.default,
-    akamai_cps_dv_validation.default
-  ]
+  depends_on                     = [ akamai_property.default ]
 }

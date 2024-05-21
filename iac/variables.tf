@@ -1,24 +1,7 @@
-# Defines the Akamai Edge network to be used in the provisioning.
-variable "network" {
-  type    = string
-  default = "STAGING"
-}
-
-# Defines the specific credentials filename.
-variable "credentialsFilename" {
-  type = string
-}
-
 # Defines the general settings filename.
 variable "generalSettingsFilename" {
   type    = string
   default = "general/settings.json"
-}
-
-# Defines the certificate settings filename.
-variable "certificateSettingsFilename" {
-  type    = string
-  default = "certificate/settings.json"
 }
 
 # Defines the DNS settings filename.
@@ -37,4 +20,40 @@ variable "propertySettingsFilename" {
 variable "securitySettingsFilename" {
   type    = string
   default = "security/settings.json"
+}
+
+# Linode API token,
+variable "linodeToken" {
+  type = string
+}
+
+# EdgeGrid API account key.
+variable "edgeGridAccountKey" {
+  type = string
+}
+
+# EdgeGrid API host.
+variable "edgeGridHost" {
+  type = string
+}
+
+# EdgeGrid API access token.
+variable "edgeGridAccessToken" {
+  type = string
+}
+
+# EdgeGrid API client token.
+variable "edgeGridClientToken" {
+  type = string
+}
+
+# EdgeGrid API client secret.
+variable "edgeGridClientSecret" {
+  type = string
+}
+
+# Defines the Akamai Edge network to be used in the provisioning.
+variable "network" {
+  type    = string
+  default = "STAGING"
 }

@@ -1,0 +1,445 @@
+{
+  "name": "akamai-as-code-secconf",
+  "description": "This file contains security configurations with the protections: DDoS, IP/GEO firewall, WAF and Bot Management.",
+  "notes": "Initial configuration.",
+  "hostnames": [
+    "www.example.com",
+    "test.example.com"
+  ],
+  "sharedResources": {
+    "networkLists": {
+      "allowedIps": [
+        "1.2.3.4"
+      ],
+      "blockedIps": [
+        "1.2.3.0/24"
+      ],
+      "blockedGeos": [
+        "CN",
+        "RU"
+      ]
+    },
+    "rateLimits": {
+      "edge": {
+        "name": "akamai-as-code-default-edgeRateLimits",
+        "averageThreshold": 50,
+        "burstThreshold": 100,
+        "clientIdentifier": "ip-useragent",
+        "matchType": "path",
+        "pathMatchType": "Custom",
+        "pathUriPositiveMatch": true,
+        "requestType": "ClientRequest",
+        "sameActionOnIpv6": true,
+        "type": "WAF",
+        "useXForwardForHeaders": false
+      },
+      "origin": {
+        "name": "akamai-as-code-default-originRateLimits",
+        "averageThreshold": 50,
+        "burstThreshold": 100,
+        "clientIdentifier": "ip-useragent",
+        "matchType": "path",
+        "pathMatchType": "Custom",
+        "pathUriPositiveMatch": true,
+        "requestType": "ForwardRequest",
+        "sameActionOnIpv6": true,
+        "type": "WAF",
+        "useXForwardForHeaders": false
+      }
+    }
+  },
+  "advanced": {
+    "bodyInspectionLimit": "default",
+    "attackPayloadLogging": {
+      "enabled" : true,
+      "requestBody" : {
+        "type" : "ATTACK_PAYLOAD"
+      },
+      "responseBody" : {
+        "type" : "ATTACK_PAYLOAD"
+      }
+    },
+    "siemLogging": {
+      "enabled": true,
+      "botManagerEvents": true,
+      "version": 1
+    },
+    "logging": {
+      "allowSampling": true,
+      "cookies": {
+        "type": "all"
+      },
+      "customHeaders": {
+        "type": "all"
+      },
+      "standardHeaders": {
+        "type": "all"
+      }
+    },
+    "stripPragmaHeaders": true,
+    "evasivePathMatch": true,
+    "piiLearning": false
+  },
+  "policies": [
+    {
+      "prefix": "pol1",
+      "name": "website-default",
+      "hostnames": [ "test.example.com" ],
+      "filePaths": [ "/*" ],
+      "ipGeoFirewall": {
+        "enabled": true,
+        "mode": "block"
+      },
+      "ddos": {
+        "rateLimits": {
+          "enabled": true,
+          "edge": {
+            "action": "alert"
+          },
+          "origin": {
+            "action": "alert"
+          }
+        },
+        "slowPost": {
+          "enabled": true,
+          "action": "alert",
+          "threshold": {
+            "rate": 10,
+            "period": 60
+          }
+        }
+      },
+      "waf": {
+        "enabled": true,
+        "attackGroups": {
+          "webPolicyViolation": {
+            "action": "alert"
+          },
+          "webAttackTool": {
+            "action": "alert"
+          },
+          "webProtocolAttack": {
+            "action": "alert"
+          },
+          "sqlInjection": {
+            "action": "alert"
+          },
+          "xssInjection": {
+            "action": "alert"
+          },
+          "commandInjection": {
+            "action": "alert"
+          },
+          "localFileInclusion": {
+            "action": "alert"
+          },
+          "remoteFileInclusion": {
+            "action": "alert"
+          },
+          "webPlatformAttack": {
+            "action": "alert"
+          }
+        },
+        "penaltyBox": {
+          "enabled": true,
+          "action": "alert"
+        }
+      },
+      "botManager": {
+        "enabled": true,
+        "general": {
+          "addAkamaiBotHeader": false,
+          "enableActiveDetections": true,
+          "enableBotManagement": true,
+          "enableBrowserValidation": false,
+          "removeBotManagementCookies": false,
+          "thirdPartyProxyServiceInUse": false
+        },
+        "detections": {
+          "akamai": {
+            "siteMonitoringAndWebDevelopmentBots": {
+              "action": "monitor"
+            },
+            "academicOrResearchBots": {
+              "action": "monitor"
+            },
+            "searchEngineBots": {
+              "action": "monitor"
+            },
+            "onlineAdvertisingBots": {
+              "action": "monitor"
+            },
+            "ecommerceSearchEngineBots": {
+              "action": "monitor"
+            },
+            "webSearchEngineBots": {
+              "action": "monitor"
+            },
+            "enterpriseDataAggregatorBots": {
+              "action": "monitor"
+            },
+            "financialServicesBots": {
+              "action": "monitor"
+            },
+            "socialMediaOrBlogBots": {
+              "action": "monitor"
+            },
+            "automatedShoppingCartAndSniperBots": {
+              "action": "monitor"
+            },
+            "webArchiverBots": {
+              "action": "monitor"
+            },
+            "businessIntelligenceBots": {
+              "action": "monitor"
+            },
+            "newsAggregatorBots": {
+              "action": "monitor"
+            },
+            "rssFeedReaderBots": {
+              "action": "monitor"
+            },
+            "financialAccountAggregatorBots": {
+              "action": "monitor"
+            },
+            "mediaOrEntertainmentSearchBots": {
+              "action": "monitor"
+            },
+            "seoAnalyticsOrMarketingBots": {
+              "action": "monitor"
+            }
+          },
+          "activeAndTransparent": {
+            "declaredBotsKeywordMatch": {
+              "action": "monitor"
+            },
+            "sessionValidation": {
+              "action": "monitor",
+              "sessionActivitySensitivity": "MEDIUM"
+            },
+            "javascriptFingerprintAnomaly": {
+              "action": "monitor"
+            },
+            "cookieIntegrityFailed": {
+              "action": "monitor"
+            },
+            "httpLibraries": {
+              "action": "monitor"
+            },
+            "aggressiveWebCrawlers": {
+              "action": "monitor"
+            },
+            "openSourceCrawlersScrapingPlatforms": {
+              "action": "monitor"
+            },
+            "webServicesLibraries": {
+              "action": "monitor"
+            },
+            "webScraperReputation": {
+              "action": "monitor",
+              "webScraperReputationSensitivity": 5
+            },
+            "browserImpersonator": {
+              "action": "monitor"
+            },
+            "headlessBrowsersAutomationTools": {
+              "action": "monitor"
+            },
+            "clientDisabledJavascriptNoScriptTriggered": {
+              "action": "monitor"
+            },
+            "javascriptFingerprintNotReceived": {
+              "action": "monitor"
+            },
+            "developmentFrameworks": {
+              "action": "monitor"
+            },
+            "impersonatorsOfKnownBots": {
+              "action": "monitor"
+            }
+          }
+        }
+      }
+    },
+    {
+      "prefix": "pol2",
+      "name": "website-deny",
+      "hostnames": [ "www.example.com" ],
+      "filePaths": [ "/*" ],
+      "ipGeoFirewall": {
+        "enabled": true,
+        "mode": "block"
+      },
+      "ddos": {
+        "rateLimits": {
+          "enabled": true,
+          "edge": {
+            "action": "alert"
+          },
+          "origin": {
+            "action": "alert"
+          }
+        },
+        "slowPost": {
+          "enabled": true,
+          "action": "alert",
+          "threshold": {
+            "rate": 10,
+            "period": 60
+          }
+        }
+      },
+      "waf": {
+        "enabled": true,
+        "attackGroups": {
+          "webPolicyViolation": {
+            "action": "deny"
+          },
+          "webAttackTool": {
+            "action": "deny"
+          },
+          "webProtocolAttack": {
+            "action": "deny"
+          },
+          "sqlInjection": {
+            "action": "deny"
+          },
+          "xssInjection": {
+            "action": "deny"
+          },
+          "commandInjection": {
+            "action": "deny"
+          },
+          "localFileInclusion": {
+            "action": "deny"
+          },
+          "remoteFileInclusion": {
+            "action": "deny"
+          },
+          "webPlatformAttack": {
+            "action": "deny"
+          }
+        },
+        "penaltyBox": {
+          "enabled": true,
+          "action": "alert"
+        }
+      },
+      "botManager": {
+        "enabled": true,
+        "general": {
+          "addAkamaiBotHeader": false,
+          "enableActiveDetections": true,
+          "enableBotManagement": true,
+          "enableBrowserValidation": false,
+          "removeBotManagementCookies": false,
+          "thirdPartyProxyServiceInUse": false
+        },
+        "detections": {
+          "akamai": {
+            "siteMonitoringAndWebDevelopmentBots": {
+              "action": "monitor"
+            },
+            "academicOrResearchBots": {
+              "action": "monitor"
+            },
+            "searchEngineBots": {
+              "action": "monitor"
+            },
+            "onlineAdvertisingBots": {
+              "action": "monitor"
+            },
+            "ecommerceSearchEngineBots": {
+              "action": "monitor"
+            },
+            "webSearchEngineBots": {
+              "action": "monitor"
+            },
+            "enterpriseDataAggregatorBots": {
+              "action": "monitor"
+            },
+            "financialServicesBots": {
+              "action": "monitor"
+            },
+            "socialMediaOrBlogBots": {
+              "action": "monitor"
+            },
+            "automatedShoppingCartAndSniperBots": {
+              "action": "monitor"
+            },
+            "webArchiverBots": {
+              "action": "monitor"
+            },
+            "businessIntelligenceBots": {
+              "action": "monitor"
+            },
+            "newsAggregatorBots": {
+              "action": "monitor"
+            },
+            "rssFeedReaderBots": {
+              "action": "monitor"
+            },
+            "financialAccountAggregatorBots": {
+              "action": "monitor"
+            },
+            "mediaOrEntertainmentSearchBots": {
+              "action": "monitor"
+            },
+            "seoAnalyticsOrMarketingBots": {
+              "action": "monitor"
+            }
+          },
+          "activeAndTransparent": {
+            "declaredBotsKeywordMatch": {
+              "action": "monitor"
+            },
+            "sessionValidation": {
+              "action": "monitor",
+              "sessionActivitySensitivity": "MEDIUM"
+            },
+            "javascriptFingerprintAnomaly": {
+              "action": "monitor"
+            },
+            "cookieIntegrityFailed": {
+              "action": "monitor"
+            },
+            "httpLibraries": {
+              "action": "monitor"
+            },
+            "aggressiveWebCrawlers": {
+              "action": "monitor"
+            },
+            "openSourceCrawlersScrapingPlatforms": {
+              "action": "monitor"
+            },
+            "webServicesLibraries": {
+              "action": "monitor"
+            },
+            "webScraperReputation": {
+              "action": "monitor",
+              "webScraperReputationSensitivity": 5
+            },
+            "browserImpersonator": {
+              "action": "monitor"
+            },
+            "headlessBrowsersAutomationTools": {
+              "action": "monitor"
+            },
+            "clientDisabledJavascriptNoScriptTriggered": {
+              "action": "monitor"
+            },
+            "javascriptFingerprintNotReceived": {
+              "action": "monitor"
+            },
+            "developmentFrameworks": {
+              "action": "monitor"
+            },
+            "impersonatorsOfKnownBots": {
+              "action": "monitor"
+            }
+          }
+        }
+      }
+    }
+  ]
+}

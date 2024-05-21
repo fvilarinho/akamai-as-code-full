@@ -1,0 +1,6 @@
+{
+  "contract": "<contract-id>",
+  "group": "<group-id>",
+  "email": "<email>",
+  "contentDirectory": "../src/content"
+}

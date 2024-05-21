@@ -1,15 +1,21 @@
 #!/bin/bash
 
-# Checks the dependencies to run this script.
+# Checks the dependencies of this script.
 function checkDependencies() {
+  if [ ! -f "$CREDENTIALS_FILENAME" ]; then
+    echo "The credentials filename was not found! Please finish the setup first to continue!"
+
+    exit 1
+  fi
+
   if [ -z "$TERRAFORM_CMD" ]; then
-    echo "Terraform is not installed! Please install it first to continue!"
+    echo "terraform is not installed! Please install it first to continue!"
 
     exit 1
   fi
 }
 
-# Prepares the environment to run this script.
+# Prepares the environment to execute this script.
 function prepareToExecute() {
   source functions.sh
 
@@ -18,7 +24,7 @@ function prepareToExecute() {
   cd iac || exit 1
 }
 
-# Undeploys the provisioned infrastructure.
+# Destroys the provisioned infrastructure based on the IaC files.
 function undeploy() {
   $TERRAFORM_CMD init \
                  -upgrade \
@@ -28,7 +34,7 @@ function undeploy() {
                  -auto-approve
 }
 
-# Main functions.
+# Main function.
 function main() {
   prepareToExecute
   checkDependencies

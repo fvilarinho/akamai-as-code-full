@@ -1,5 +1,4 @@
-# Definition of the Akamai Connected Cloud credentials.
+# Definition of the Akamai Cloud Computing (formerly Linode) credentials.
 provider "linode" {
-  config_path    = pathexpand(fileexists(pathexpand(var.credentialsFilename)) ? var.credentialsFilename : "~/.aws/credentials")
-  config_profile = fileexists(pathexpand(var.credentialsFilename)) ? "linode" : "default"
+  token = var.linodeToken
 }
