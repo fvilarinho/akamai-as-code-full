@@ -14,8 +14,8 @@ resource "akamai_dns_record" "certificateValidation" {
   recordtype = "CNAME"
   ttl        = 30
   zone       = local.dnsSettings.zone
-  target     = [data.akamai_property_hostnames.default[each.key].hostnames[0].cert_status[0].target]
-  depends_on = [data.akamai_property_hostnames.default]
+  target     = [ data.akamai_property_hostnames.default[each.key].hostnames[0].cert_status[0].target ]
+  depends_on = [ data.akamai_property_hostnames.default ]
 }
 
 # Definition of the Edge DNS general entries.

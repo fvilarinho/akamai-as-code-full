@@ -14,8 +14,13 @@ data "akamai_property_rules_template" "default" {
   variables {
     name  = "cpCode"
     type  = "number"
-    value = replace(akamai_cp_code.default.id, "cpc_", "")
+    value = replace(akamai_cp_code.default[each.key].id, "cpc_", "")
   }
+
+  depends_on = [
+    linode_object_storage_bucket.default,
+    akamai_cp_code.default
+  ]
 }
 
 # Definition of the property (CDN configuration).
