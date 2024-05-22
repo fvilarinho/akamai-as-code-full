@@ -2,12 +2,6 @@
 
 # Checks the dependencies of this script.
 function checkDependencies() {
-  if [ ! -f "$CREDENTIALS_FILENAME" ]; then
-    echo "The credentials filename was not found! Please finish the setup first to continue!"
-
-    exit 1
-  fi
-
   if [ -z "$TERRAFORM_CMD" ]; then
     echo "terraform is not installed! Please install it first to continue!"
 
