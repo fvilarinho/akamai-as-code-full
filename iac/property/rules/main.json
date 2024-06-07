@@ -17,24 +17,24 @@
             "{{Origin Hostname}}",
             "{{Forward Host Header}}"
           ],
-          "enableTrueClientIp": false,
+          "enableTrueClientIp": true,
           "forwardHostHeader": "ORIGIN_HOSTNAME",
           "hostname": "${env.originHostname}",
           "httpPort": 80,
           "httpsPort": 443,
+          "ipVersion": "IPV4",
+          "minTlsVersion": "DYNAMIC",
           "originCertsToHonor": "COMBO",
           "originSni": true,
           "originType": "CUSTOMER",
-          "verificationMode": "CUSTOM",
-          "ipVersion": "IPV4",
-          "customCertificates": [],
-          "customCertificateAuthorities": [],
           "standardCertificateAuthorities": [
             "akamai-permissive",
             "THIRD_PARTY_AMAZON"
           ],
-          "minTlsVersion": "DYNAMIC",
-          "tls13Support": false
+          "tls13Support": false,
+          "verificationMode": "CUSTOM",
+          "trueClientIpHeader": "True-Client-IP",
+          "trueClientIpClientSetting": false
         }
       },
       {
@@ -44,8 +44,25 @@
             "id": "${env.cpCode}"
           }
         }
+      },
+      {
+        "name": "report",
+        "options": {
+          "logHost": true,
+          "logReferer": true,
+          "logUserAgent": true,
+          "logAcceptLanguage": true,
+          "logCookies": "OFF",
+          "logCustomLogField": false,
+          "logEdgeIP": true,
+          "logXForwardedFor": true
+        }
       }
     ],
+    "options": {
+      "is_secure": false
+    },
+    "variables": [],
     "comments": "The behaviors in the Default Rule apply to all requests for the property hostname(s) unless another rule overrides the Default Rule settings."
   },
   "comments": "Initial configuration."
