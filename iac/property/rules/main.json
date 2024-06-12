@@ -59,6 +59,18 @@
           "logEdgeIP": true,
           "logXForwardedFor": true
         }
+      },
+      {
+        "name": "datastream",
+        "options": {
+          "streamType": "LOG",
+          "logStreamTitle": "",
+          "logEnabled": true,
+          "logStreamName": [
+            "71852"
+          ],
+          "samplingPercentage": 100
+        }
       }
     ],
     "options": {
