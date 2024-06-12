@@ -1,3 +1,12 @@
+locals {
+  datastreamAvailable = compact([ for stream in data.akamai_datastreams.default.streams_details : ( stream.stream_name == local.propertySettings.dataStream ? stream.stream_id : null)])
+}
+
+data "akamai_datastreams" "default" {
+  group_id = local.generalSettings.group
+}
+
+
 # Definition of the property rules (CDN configuration).
 data "akamai_property_rules_template" "default" {
   for_each      = { for property in local.propertySettings.hostnames : property.name => property }
@@ -15,6 +24,18 @@ data "akamai_property_rules_template" "default" {
     name  = "cpCode"
     type  = "number"
     value = replace(akamai_cp_code.default[each.key].id, "cpc_", "")
+  }
+
+  variables {
+    name  = "dataStreamEnabled"
+    type  = "bool"
+    value = (length(local.datastreamAvailable) > 0 ? true : false)
+  }
+
+  variables {
+    name  = "dataStreamAvailable"
+    type  = "jsonBlock"
+    value = jsonencode(local.datastreamAvailable)
   }
 
   depends_on = [

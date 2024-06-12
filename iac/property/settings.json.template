@@ -18,6 +18,7 @@
       }
     }
   ],
+  "dataStream": null,
   "ipVersion": "IPV4",
   "notes": "Initial configuration."
 }

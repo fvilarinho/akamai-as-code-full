@@ -64,11 +64,8 @@
         "name": "datastream",
         "options": {
           "streamType": "LOG",
-          "logStreamTitle": "",
-          "logEnabled": true,
-          "logStreamName": [
-            "71852"
-          ],
+          "logEnabled": "${env.dataStreamEnabled}",
+          "logStreamName": "${env.dataStreamAvailable}",
           "samplingPercentage": 100
         }
       }
