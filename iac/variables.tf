@@ -51,9 +51,3 @@ variable "edgeGridClientToken" {
 variable "edgeGridClientSecret" {
   type = string
 }
-
-# Defines the Akamai Edge network to be used in the provisioning.
-variable "network" {
-  type    = string
-  default = "STAGING"
-}

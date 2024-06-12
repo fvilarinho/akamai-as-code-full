@@ -22,12 +22,6 @@ pipeline {
       }
     }
 
-    stage('Activate') {
-      steps {
-        echo 'Activate in production'
-      }
-    }
-
     stage('Notify') {
       steps {
         echo 'Notify'

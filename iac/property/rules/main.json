@@ -34,7 +34,9 @@
           "tls13Support": false,
           "verificationMode": "CUSTOM",
           "trueClientIpHeader": "True-Client-IP",
-          "trueClientIpClientSetting": false
+          "trueClientIpClientSetting": false,
+          "customCertificateAuthorities": [],
+          "customCertificates": []
         }
       },
       {

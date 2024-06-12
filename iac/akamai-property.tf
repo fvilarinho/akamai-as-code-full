@@ -45,14 +45,32 @@ resource "akamai_property" "default" {
   ]
 }
 
-# Activates the property (CDN configuration).
-resource "akamai_property_activation" "default" {
+# Activates the property (CDN configuration) in staging network.
+resource "akamai_property_activation" "staging" {
   for_each                       = { for property in local.propertySettings.hostnames : property.name => property }
   property_id                    = akamai_property.default[each.key].id
   version                        = akamai_property.default[each.key].latest_version
   contact                        = [ local.generalSettings.email ]
   note                           = local.propertySettings.notes
-  network                        = var.network
+  network                        = "STAGING"
   auto_acknowledge_rule_warnings = true
   depends_on                     = [ akamai_property.default ]
+}
+
+# Activates the property (CDN configuration) in production network.
+resource "akamai_property_activation" "production" {
+  for_each                       = { for property in local.propertySettings.hostnames : property.name => property }
+  property_id                    = akamai_property.default[each.key].id
+  version                        = akamai_property.default[each.key].latest_version
+  contact                        = [ local.generalSettings.email ]
+  note                           = local.propertySettings.notes
+  network                        = "PRODUCTION"
+  auto_acknowledge_rule_warnings = true
+
+  compliance_record {
+    noncompliance_reason_no_production_traffic {
+    }
+  }
+
+  depends_on = [ akamai_property_activation.staging ]
 }

@@ -5,7 +5,7 @@ resource "akamai_appsec_configuration" "default" {
   name        = local.securitySettings.name
   description = local.securitySettings.description
   host_names  = local.securitySettings.hostnames
-  depends_on  = [ akamai_property_activation.default ]
+  depends_on  = [ akamai_property.default ]
 }
 
 # Fetches the security configuration metadata.
@@ -14,13 +14,13 @@ data "akamai_appsec_configuration" "default" {
   depends_on = [ akamai_appsec_configuration.default ]
 }
 
-# Activates the security configuration.
-resource "akamai_appsec_activations" "default" {
+# Activates the security configuration in staging network.
+resource "akamai_appsec_activations" "staging" {
   config_id           = akamai_appsec_configuration.default.config_id
   version             = data.akamai_appsec_configuration.default.latest_version
   note                = local.securitySettings.notes
   notification_emails = [ local.generalSettings.email ]
-  network             = var.network
+  network             = "STAGING"
   depends_on          = [
     akamai_appsec_configuration.default,
     akamai_networklist_network_list.allowedIps,
@@ -82,4 +82,14 @@ resource "akamai_appsec_activations" "default" {
     akamai_botman_bot_detection_action.webScraperReputation,
     akamai_botman_bot_detection_action.webServicesLibraries
   ]
+}
+
+# Activates the security configuration in production network.
+resource "akamai_appsec_activations" "production" {
+  config_id           = akamai_appsec_configuration.default.config_id
+  version             = data.akamai_appsec_configuration.default.latest_version
+  note                = local.securitySettings.notes
+  notification_emails = [ local.generalSettings.email ]
+  network             = "PRODUCTION"
+  depends_on          = [ akamai_appsec_activations.staging ]
 }
